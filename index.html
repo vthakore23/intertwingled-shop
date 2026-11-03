@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Intertwingled Shop</title>
+
+  <!-- =====================================================
+       THE INTERTWINGLED SHOP
+       An online shop where nothing is for sale alone.
+       MADD midterm (Intertwingularity) group project
+       ===================================================== -->
+
+  <style>
+    /* ---------- basic page setup ---------- */
+    :root {
+      --bg: #f4f1ea;
+      --ink: #1b1b1f;
+      --accent: #ff3b6b;
+      --accent2: #2b5cff;
+      --card: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Courier New", Courier, monospace;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    a { color: var(--accent2); }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 3px solid var(--ink);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 10;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    #cart {
+      border: 2px solid var(--ink);
+      padding: 6px 12px;
+      font-weight: bold;
+      background: var(--card);
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    #cart:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+    .hero {
+      padding: 48px 24px 24px;
+      max-width: 900px;
+    }
+
+    .hero h2 {
+      font-size: 2.4rem;
+      margin: 0 0 12px;
+      line-height: 1.1;
+    }
+
+    .hero p { font-size: 1.05rem; }
+
+    .marquee {
+      overflow: hidden;
+      white-space: nowrap;
+      border-top: 2px solid var(--ink);
+      border-bottom: 2px solid var(--ink);
+      padding: 6px 0;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    .marquee span {
+      display: inline-block;
+      animation: slide 1.5s linear infinite;   /* lower number = faster, harder to read */
+    }
+
+    @keyframes slide {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      padding: 32px 24px;
+    }
+
+    .product {
+      background: var(--card);
+      border: 2px solid var(--ink);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.15s;
+      scroll-margin-top: 90px;
+    }
+
+    .product:hover { transform: rotate(-1deg) scale(1.02); }
+
+
+    .product.linked {
+      outline: 4px dashed var(--accent);
+      outline-offset: 4px;
+    }
+
+    .product img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border: 2px solid var(--ink);
+      background: repeating-linear-gradient(
+        45deg, #ddd, #ddd 10px, #eee 10px, #eee 20px
+      );
+    }
+
+    .product h3 { margin: 12px 0 4px; font-size: 1.1rem; }
+
+    .caption {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin: 0 0 8px;
+    }
+
+    .product p.desc { font-size: 0.9rem; flex-grow: 1; }
+
+    .connections {
+      font-size: 0.8rem;
+      margin: 8px 0;
+    }
+
+
+    .price {
+      font-size: 1.4rem;
+      font-weight: bold;
+      border: none;
+      background: none;
+      color: var(--accent);
+      cursor: default;
+      font-family: inherit;
+      text-align: left;
+      padding: 4px 0;
+    }
+
+    /* shake animation, need to sort out still */
+    .price.glitch { animation: shake 0.3s; }
+
+    @keyframes shake {
+      0%   { transform: translate(0, 0); }
+      25%  { transform: translate(-3px, 2px) skewX(10deg); color: var(--accent2); }
+      50%  { transform: translate(3px, -2px) skewX(-10deg); }
+      75%  { transform: translate(-2px, 1px); color: #00c48c; }
+      100% { transform: translate(0, 0); }
+    }
+
+    .add {
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      border: 2px solid var(--ink);
+      background: var(--ink);
+      color: var(--bg);
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .add:hover { background: var(--accent); border-color: var(--accent); }
+
+    
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: var(--bg);
+      padding: 10px 18px;
+      border: 2px solid var(--accent);
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    #toast.show { opacity: 1; }
+
+   
+    #cart-panel {
+      display: none;             
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(380px, 100%);
+      height: 100%;
+      overflow-y: auto;
+      background: var(--card);
+      border-left: 3px solid var(--ink);
+      padding: 24px;
+      z-index: 20;
+    }
+
+    #cart-panel.open { display: block; }
+
+    #cart-panel h2 { margin-top: 0; font-size: 1.2rem; }
+
+    #cart-list { list-style: none; padding: 0; margin: 0; }
+
+    #cart-list li {
+      border-bottom: 1px dashed var(--ink);
+      padding: 10px 0;
+      font-size: 0.85rem;
+    }
+
+    #cart-list .now { color: var(--accent); font-weight: bold; }
+
+    #cart-total {
+      margin-top: 16px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    #cart-close {
+      font-family: inherit;
+      border: 2px solid var(--ink);
+      background: none;
+      cursor: pointer;
+      padding: 4px 10px;
+      float: right;
+    }
+
+    .view-cart-bottom {
+      text-align: center;
+      padding: 0 24px 48px;
+    }
+
+
+    .about {
+      padding: 32px 24px 64px;
+      max-width: 900px;
+      border-top: 3px solid var(--ink);
+    }
+
+    .about h2 { margin-top: 0; }
+
+    .about dl { font-size: 0.9rem; }
+    .about dt { font-weight: bold; margin-top: 12px; }
+    .about dd { margin: 0; }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>The Intertwingled Shop</h1>
+    <button id="cart">cart: <span id="cart-count">0</span> : view?</button>
+  </header>
+
+  <!-- =============== intro, figure how much we want to include in the intro=============== -->
+  <section class="hero">
+    <h2>Welcome!
+    </h2>
+    <p>
+      We hope you find what you are looking for. Click around, PLEASE.
+    </p>
+  </section>
+
+  <div class="marquee">
+    <span>
+      everything is deeply intertwingled &nbsp;&bull;&nbsp;
+      prices subject to change on contact &nbsp;&bull;&nbsp;
+      no refunds, no isolation &nbsp;&bull;&nbsp;
+      everything is deeply intertwingled &nbsp;&bull;&nbsp;
+      prices subject to change on contact &nbsp;&bull;&nbsp;
+      no refunds, no isolation &nbsp;&bull;&nbsp;
+    </span>
+  </div>
+
+  <!-- =============== Images/pdcts =============== -->
+  -->
+  <section class="products">
+
+    <!-- ---------- sketch 1 ---------- -->
+    <article class="product" id="item-1" data-price="12" data-links="item-2 item-4">
+      <img src="sketch1.png" alt="Sketch 1">
+      <h3>Title of Sketch One</h3>
+      <p class="caption">  caption maybe</p>
+      <p class="desc">
+        maybe 1-2 sentences here
+
+      </p>
+      <p class="connections">
+        connected to:
+        <a href="#item-2">Sketch Two</a>,
+        <a href="#item-4">Sketch Four</a>
+      </p>
+      <button class="price">$12.00</button>
+      <button class="add">add to cart</button>
+    </article>
+
+    <!-- ---------- sketch 2 ---------- -->
+    <article class="product" id="item-2" data-price="8" data-links="item-1 item-3">
+      <img src="sketch2.png" alt="Sketch 2">
+      <h3>Title of Sketch Two</h3>
+      <p class="caption">caption maybe
+      <p class="desc">
+        maybe 1-2 sentences here
+      </p>
+      <p class="connections">
+        connected to:
+        <a href="#item-1">Sketch One</a>,
+        <a href="#item-3">Sketch Three</a>
+      </p>
+      <button class="price">$8.00</button>
+      <button class="add">add to cart</button>
+    </article>
+
+    <!-- ---------- sketch 3 ---------- -->
+    <article class="product" id="item-3" data-price="20" data-links="item-2 item-4">
+      <img src="sketch3.png" alt="Sketch 3">
+      <h3>Title of Sketch Three</h3>
+      <p class="caption">caption maybe
+      <p class="desc">
+        maybe 1-2 sentences here
+      </p>
+      <p class="connections">
+        connected to:
+        <a href="#item-2">Sketch Two</a>,
+        <a href="#item-4">Sketch Four</a>
+      </p>
+      <button class="price">$20.00</button>
+      <button class="add">add to cart</button>
+    </article>
+
+    <!-- ---------- sketch 4 ---------- -->
+    <article class="product" id="item-4" data-price="5" data-links="item-1 item-3">
+      <img src="sketch4.png" alt="Sketch 4">
+      <h3>Title of Sketch Four</h3>
+      <p class="caption">caption maybe
+      <p class="desc">
+        maybe 1-2 sentences here
+      </p>
+      <p class="connections">
+        connected to:
+        <a href="#item-1">Sketch One</a>,
+        <a href="#item-3">Sketch Three</a>
+      </p>
+      <button class="price">$5.00</button>
+      <button class="add">add to cart</button>
+    </article>
+
+  </section>
+
+  <div class="view-cart-bottom">
+    <button class="add" id="view-cart-bottom">view cart</button>
+  </div>
+
+  <!-- =============== ABOUT =============== -->
+  <section class="about">
+    <h2>About this shop</h2>
+    <p>
+      <strong>Intertwingularity</strong> write short blurb about it here
+
+    </p>
+
+    <dl>
+      <dt>Title</dt>
+      <dd>The Intertwingled Shop</dd>
+
+      <dt>Authors</dt>
+      <dd></dd>
+
+      <dt>Medium</dt>
+      <dd></dd>
+
+      <dt>Anything else?</dt>
+      <dd>
+
+      </dd>
+    </dl>
+  </section>
+
+  <div id="toast"></div>
+
+  <!-- =============== CART PANEL (slides in from the right) =============== -->
+  <aside id="cart-panel">
+    <button id="cart-close">close</button>
+    <h2>your cart</h2>
+    <ul id="cart-list"></ul>
+    <p id="cart-total">total: $0.00</p>
+    <p style="font-size:0.8rem; opacity:0.7;">
+      prices shown are what they were when you added them vs. what they are now.
+    </p>
+  </aside>
+
+  <!-- =============== JAVASCRIPT =============== -->
+  <script>
+    // Grab all the products on the page.
+    const products = document.querySelectorAll('.product');
+    const cartCount = document.getElementById('cart-count');
+    const toast = document.getElementById('toast');
+    const cartPanel = document.getElementById('cart-panel');
+    const cartList = document.getElementById('cart-list');
+    const cartTotal = document.getElementById('cart-total');
+    let cart = [];   // every item that has been added, in order
+
+    // helper that shows a message at the bottom of the screen.
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    //  helper that writes a number as $12.50
+    function money(n) {
+      return '$' + n.toFixed(2);
+    }
+
+    // GLITCH 1 the price goes up every time someone adds it to the cart.
+    // Because everything is connected, the OTHER prices creep up too and they might not see that? should we reconsider this.
+    function raisePrice(product, amount) {
+      const priceButton = product.querySelector('.price');
+      let price = parseFloat(product.dataset.price);
+      price = price + amount;
+      product.dataset.price = price;        // this helps it remember the the new price
+      priceButton.textContent = money(price);
+
+      // replay the shake animation
+      priceButton.classList.remove('glitch');
+      void priceButton.offsetWidth;         // tiny trick to restart CSS animation
+      priceButton.classList.add('glitch');
+    }
+
+    // puts one product into the cart list, remembering the price at that moment
+    function addToCart(product) {
+      cart.push({
+        product: product,
+        name: product.querySelector('h3').textContent,
+        priceWhenAdded: parseFloat(product.dataset.price)
+      });
+    }
+
+    // redraws the cart panel from the cart list
+    function renderCart() {
+      cartList.innerHTML = '';
+      let total = 0;
+      cart.forEach(item => {
+        const now = parseFloat(item.product.dataset.price);
+        total = total + now;
+        const li = document.createElement('li');
+        li.innerHTML = item.name +
+          '<br>added at ' + money(item.priceWhenAdded) +
+          ' &rarr; now <span class="now">' + money(now) + '</span>';
+        cartList.appendChild(li);
+      });
+      cartTotal.textContent = 'total: ' + money(total);
+      cartCount.textContent = cart.length;
+    }
+
+    function openCart() {
+      renderCart();
+      cartPanel.classList.add('open');
+    }
+
+    function closeCart() {
+      cartPanel.classList.remove('open');
+    }
+
+    products.forEach(product => {
+      const addButton = product.querySelector('.add');
+      const linkedIds = product.dataset.links.split(' ');
+
+      // GLITCH 2 is that you can't buy just one.
+      // Adding one item also adds everything it's connected to,
+      // and THEN the prices jump (this one a lot, the linked ones a little).
+      addButton.addEventListener('click', () => {
+        addToCart(product);
+        raisePrice(product, 1.5);
+        linkedIds.forEach(id => {
+          const other = document.getElementById(id);
+          if (other) {
+            addToCart(other);
+            raisePrice(other, 0.25);
+          }
+        });
+        renderCart();
+        showToast('added ' + (1 + linkedIds.length) + ' items. you can\'t buy just one.');
+      });
+
+      // hovering one product lights up the ones it's tied to
+      product.addEventListener('mouseenter', () => {
+        linkedIds.forEach(id => {
+          const other = document.getElementById(id);
+          if (other) other.classList.add('linked');
+        });
+      });
+      product.addEventListener('mouseleave', () => {
+        linkedIds.forEach(id => {
+          const other = document.getElementById(id);
+          if (other) other.classList.remove('linked');
+        });
+      });
+    });
+
+    // open / close the cart panel
+    document.getElementById('cart').addEventListener('click', openCart);
+    document.getElementById('view-cart-bottom').addEventListener('click', openCart);
+    document.getElementById('cart-close').addEventListener('click', closeCart);
+
+    // GLITCH 3 is that every few seconds, a random price drifts up on its own.
+    // The thing is this might make it not seem normal at first so we could delete this but its like maybe a form of monitization?
+    setInterval(() => {
+      const random = products[Math.floor(Math.random() * products.length)];
+      raisePrice(random, 0.10);
+      if (cartPanel.classList.contains('open')) renderCart();  // keep the cart honest
+    }, 6000);
+  </script>
+
+</body>
+</html>
