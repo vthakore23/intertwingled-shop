@@ -186,7 +186,36 @@
 
     .add:hover { background: var(--accent); border-color: var(--accent); }
 
-    
+    /* ---------- GLITCH 4: the dimmer ----------
+       a black sheet over the whole page. it starts invisible (opacity 0)
+       and every "turn on light" click makes it a little MORE visible,
+       so the site gets darker the more light you buy. */
+    #dimmer {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;      /* lets clicks pass through to the page */
+      transition: opacity 0.8s;
+      z-index: 30;
+    }
+
+    .light-btn {
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      margin-top: 6px;
+      border: 2px solid var(--ink);
+      background: #ffe56b;       /* lightbulb yellow */
+      color: var(--ink);
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .light-btn:hover { background: #fff3a8; }
+
+
     #toast {
       position: fixed;
       bottom: 20px;
@@ -369,6 +398,26 @@
       <button class="add">add to cart</button>
     </article>
 
+    <!-- ---------- sketch 5: UNLIMITED LIGHT ---------- -->
+    <!-- GLITCH 4 lives here (the "turn on light" button at the bottom; the JS for it is at the very end).
+         price is "xxx" for now, change data-price AND the $ text below -->
+    <article class="product" id="item-5" data-price="99" data-links="item-2">
+      <img src="sketch5.png" alt="Unlimited Light">
+      <h3>Unlimited Light</h3>
+      <p class="caption">[author name] &mdash; digital photograph, databent</p>
+      <p class="desc">
+        Left: the light on. Right: what you paid for. The two states
+        can't stay separate, and neither can your money.
+      </p>
+      <p class="connections">
+        connected to:
+        <a href="#item-2">Sketch Two</a>
+      </p>
+      <button class="price">$99.00</button>
+      <button class="add">add to cart</button>
+      <button class="light-btn" id="turn-on-light">turn on light</button>
+    </article>
+
   </section>
 
   <div class="view-cart-bottom">
@@ -401,6 +450,9 @@
   </section>
 
   <div id="toast"></div>
+
+  <!-- the dimmer sheet for GLITCH 4 (see the CSS + JS for it) -->
+  <div id="dimmer"></div>
 
   <!-- =============== CART PANEL (slides in from the right) =============== -->
   <aside id="cart-panel">
@@ -534,6 +586,62 @@
       raisePrice(random, 0.10);
       if (cartPanel.classList.contains('open')) renderCart();  // keep the cart honest
     }, 6000);
+
+    // GLITCH 4: "turn on light" makes the whole site DIMMER,
+    // and then you have to keep PAYING to keep it on.
+    //
+    // how it works:
+    //   1. first click = light "on". page dims one step, a timer starts.
+    //   2. every 4 seconds the page gets darker on its own.
+    //   3. the button now says "pay to keep lights on". paying adds
+    //      Unlimited Light to your cart (price goes up each time) and
+    //      brightens the page a little, but never all the way back,
+    //      and the timer never stops. you pay more for less light.
+    //
+    // darkness: 0 = clear page, 1 = fully black. we cap at 0.9.
+    const dimmer = document.getElementById('dimmer');
+    const lightButton = document.getElementById('turn-on-light');
+    const lightProduct = document.getElementById('item-5');
+    let darkness = 0;
+    let lightOn = false;
+    let timesPaid = 0;
+
+    function setDarkness(value) {
+      darkness = Math.max(0, Math.min(value, 0.9));
+      dimmer.style.opacity = darkness;
+    }
+
+    function brightnessPercent() {
+      return Math.round((1 - darkness) * 100) + '%';
+    }
+
+    lightButton.addEventListener('click', () => {
+      if (!lightOn) {
+        // ---- first click: turn the light on ----
+        lightOn = true;
+        setDarkness(darkness + 0.15);
+        lightButton.textContent = 'pay to keep lights on';
+        showToast('light on. brightness: ' + brightnessPercent());
+
+        // the light starts fading right away and never stops
+        setInterval(() => {
+          setDarkness(darkness + 0.1);
+          showToast('the light is fading. brightness: ' + brightnessPercent());
+        }, 4000);
+
+      } else {
+        // ---- every click after that: pay to keep it on ----
+        timesPaid = timesPaid + 1;
+        addToCart(lightProduct);
+        raisePrice(lightProduct, 5 * timesPaid);   // each payment costs more than the last
+        renderCart();
+        // a little brighter, but every payment raises the floor,
+        // so it can never get back to as bright as it was before
+        setDarkness(Math.max(darkness - 0.2, timesPaid * 0.05));
+        showToast('paid ' + money(parseFloat(lightProduct.dataset.price)) +
+                  ' to keep the lights on. brightness: ' + brightnessPercent());
+      }
+    });
   </script>
 
 </body>
