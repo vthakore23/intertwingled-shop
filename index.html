@@ -341,7 +341,7 @@
       <p class="connections">
         connected to:
         <a href="#item-2">Green Room</a>,
-        <a href="#item-3">Sketch Three</a>
+        <a href="#item-3">Trying to Keep Everything in Order</a>
       </p>
       <button class="price">$12.00</button>
       <button class="add">add to cart</button>
@@ -359,28 +359,22 @@
       <p class="connections">
         connected to:
         <a href="#item-1">A Path to Somewhere</a>,
-        <a href="#item-3">Sketch Three</a>
+        <a href="#item-3">Trying to Keep Everything in Order</a>
       </p>
       <button class="price">$8.00</button>
       <button class="add">add to cart</button>
     </article>
 
     <!-- ---------- sketch 3 ---------- -->
-    <article class="product" id="item-3" data-price="20" data-links="item-2 item-5">
-      <img src="sketch3.png" alt="Sketch 3">
-      <h3>Title of Sketch Three</h3>
-      <p class="caption">caption maybe
-      <p class="desc">
-        maybe 1-2 sentences here
-      </p>
-      <p class="connections">
-        connected to:
-        <a href="#item-2">Green Room</a>,
-        <a href="#item-5">Sunlight</a>
-      </p>
-      <button class="price">$20.00</button>
-      <button class="add">add to cart</button>
-    </article>
+    <article class="product phoebe-product" id="item-3" data-price="3.3" data-links="item-6 item-2">
+<img src="phoebe-order.webp" alt="Trying to Keep Everything in Order" style="object-fit:contain;background:#fff">
+<h3>Trying to Keep Everything in Order</h3>
+<p class="caption">Phoebe Chen, digital sketch</p>
+<p class="desc">A repeated sentence begins as a neat pattern, then drifts, breaks, and returns. The work turns the effort to maintain order into a fragile visual rhythm—one that keeps reorganizing itself without ever fully settling.</p>
+<p class="caption">Music: <a href="https://pixabay.com/music/solo-piano-minimal-piano-588210/" target="_blank" rel="noopener noreferrer">Minimal Piano — AtlasAudio</a></p>
+<p class="connections">connected to: <a href="#item-6">Loops Between Us</a>, <a href="#item-2">Green Room</a></p>
+<button class="price">$3.30</button><button class="add">add to cart</button>
+</article>
 
 
     <!-- ---------- sketch 5: UNLIMITED LIGHT ---------- -->
@@ -403,6 +397,42 @@
       <button class="light-btn" id="turn-on-light">turn on light</button>
     </article>
 
+<article class="product phoebe-product" id="item-6" data-price="18.8" data-links="item-3 item-1">
+<img src="phoebe-loops.webp" alt="Loops Between Us" style="object-fit:contain;background:#fff">
+<h3>Loops Between Us</h3>
+<p class="caption">Phoebe Chen, digital sketch</p>
+<p class="desc">Red and ribbon-like lines wind crossing and folding back into themselves. Each curve feels separate at first, but the loops gradually reveal a shared path…</p>
+<p class="caption">Music: <a href="https://pixabay.com/music/mystery-dreamy-ambient-349022/" target="_blank" rel="noopener noreferrer">Dreamy Ambient — Tunetank</a></p>
+<p class="connections">connected to: <a href="#item-3">Trying to Keep Everything in Order</a>, <a href="#item-1">A Path to Somewhere</a></p>
+<button class="price">$18.80</button><button class="add">add to cart</button>
+</article>
+<article class="product phoebe-product" id="item-7" data-price="22.9" data-links="item-6 item-8">
+<img src="phoebe-touch.webp" alt="Reading Through Touch" style="object-fit:contain;background:#fff">
+<h3>Reading Through Touch</h3>
+<p class="caption">Phoebe Chen, digital sketch</p>
+<p class="desc">The work explores how meaning emerges through touch, as the surface becomes an interface between the artwork and its reader.</p>
+<p class="caption">Music: <a href="https://pixabay.com/music/solo-instruments-kalimba-song-147122/" target="_blank" rel="noopener noreferrer">Kalimba Song — Alex_Jauk</a></p>
+<p class="connections">connected to: <a href="#item-6">Loops Between Us</a>, <a href="#item-8">A Dog, Interrupted</a></p>
+<button class="price">$22.90</button><button class="add">add to cart</button>
+</article>
+<article class="product phoebe-product" id="item-8" data-price="16.6" data-links="item-7 item-5">
+<img src="phoebe-dog.webp" alt="A Dog, Interrupted" style="object-fit:contain;background:#fff">
+<h3>A Dog, Interrupted</h3>
+<p class="caption">Phoebe Chen, digital sketch</p>
+<p class="desc">A small white dog appears in a familiar snapshot, but the image bends and stretches around it. A dreamlike moment conjuring up…</p>
+<p class="caption">Music: <a href="https://pixabay.com/music/sneaky-quirky-whimsical-play-212195/" target="_blank" rel="noopener noreferrer">Quirky Whimsical Play — Sonican</a></p>
+<p class="connections">connected to: <a href="#item-7">Reading Through Touch</a>, <a href="#item-5">Sunlight</a></p>
+<button class="price">$16.60</button><button class="add">add to cart</button>
+</article>
+<article class="product phoebe-product" id="item-9" data-price="17.7" data-links="item-1 item-3">
+<img src="phoebe-staircase.webp" alt="Staircase, Reassembled" style="object-fit:contain;background:#fff">
+<h3>Staircase, Reassembled</h3>
+<p class="caption">Phoebe Chen, digital sketch</p>
+<p class="desc">A staircase is broken into tiled fragments, stretched textures, and blank blocks. How will you step on it?</p>
+<p class="caption">Music: <a href="https://pixabay.com/music/corporate-ambient-glitch-164166/" target="_blank" rel="noopener noreferrer">Ambient Glitch — MomotMusic</a></p>
+<p class="connections">connected to: <a href="#item-1">A Path to Somewhere</a>, <a href="#item-3">Trying to Keep Everything in Order</a></p>
+<button class="price">$17.70</button><button class="add">add to cart</button>
+</article>
   </section>
 
   <div class="view-cart-bottom">
@@ -449,6 +479,18 @@
 
   <!-- =============== JAVASCRIPT =============== -->
   <script>
+    // Keep product connections inside the preview, including netnet's proxied URLs.
+    document.querySelector('.products').addEventListener('click', (event) => {
+      const link = event.target.closest('.connections a');
+      if (!link) return;
+      const match = link.getAttribute('href').match(/#(item-\d+)/);
+      const target = match && document.getElementById(match[1]);
+      if (target) {
+        event.preventDefault();
+        target.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+    });
+
     // Grab all the products on the page.
     const products = document.querySelectorAll('.product');
     const cartCount = document.getElementById('cart-count');
