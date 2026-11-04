@@ -428,8 +428,13 @@
   <section class="about">
     <h2>About this shop</h2>
     <p>
-      <strong>Intertwingularity</strong> write short blurb about it here
-
+      <strong>Intertwingularity</strong> is Ted Nelson's word for the idea that
+      nothing can be understood on its own: everything is tangled up with
+      everything else. An online shop pretends the opposite. Every item has its
+      own price, its own box, its own button. So we built a shop and let the
+      tangle back in. Our sketches are the products. Add one and its neighbors
+      come with it. Prices move when you touch them. Buy light and the room gets
+      darker. Nothing here is for sale alone.
     </p>
 
     <dl>
@@ -437,14 +442,15 @@
       <dd>The Intertwingled Shop</dd>
 
       <dt>Authors</dt>
-      <dd></dd>
+      <dd>Phoebe Chen, Stephen Jin, Vijay Thakore</dd>
 
       <dt>Medium</dt>
-      <dd></dd>
+      <dd>HTML, CSS, and JavaScript built in netnet.studio, with our own photographs and sketches</dd>
 
       <dt>Anything else?</dt>
       <dd>
-
+        Made for anyone who shops online without thinking about it. The glitches
+        are meant to make you notice the moment you click.
       </dd>
     </dl>
   </section>
@@ -594,9 +600,9 @@
     //   1. first click = light "on". page dims one step, a timer starts.
     //   2. every 4 seconds the page gets darker on its own.
     //   3. the button now says "pay to keep lights on". paying adds
-    //      Unlimited Light to your cart (price goes up each time) and
-    //      brightens the page a little, but never all the way back,
-    //      and the timer never stops. you pay more for less light.
+    //      Unlimited Light to your cart (+$1 each time), brightens the
+    //      page, and SLOWS the fade down. but the fade never fully stops,
+    //      and it never gets back to as bright as before you started.
     //
     // darkness: 0 = clear page, 1 = fully black. we cap at 0.9.
     const dimmer = document.getElementById('dimmer');
@@ -605,6 +611,7 @@
     let darkness = 0;
     let lightOn = false;
     let timesPaid = 0;
+    let fadeAmount = 0.1;     // how much darker it gets each tick. paying shrinks this.
 
     function setDarkness(value) {
       darkness = Math.max(0, Math.min(value, 0.9));
@@ -625,7 +632,7 @@
 
         // the light starts fading right away and never stops
         setInterval(() => {
-          setDarkness(darkness + 0.1);
+          setDarkness(darkness + fadeAmount);
           showToast('the light is fading. brightness: ' + brightnessPercent());
         }, 4000);
 
@@ -633,11 +640,13 @@
         // ---- every click after that: pay to keep it on ----
         timesPaid = timesPaid + 1;
         addToCart(lightProduct);
-        raisePrice(lightProduct, 5 * timesPaid);   // each payment costs more than the last
+        raisePrice(lightProduct, 1);               // a chill $1 more each time
         renderCart();
-        // a little brighter, but every payment raises the floor,
-        // so it can never get back to as bright as it was before
-        setDarkness(Math.max(darkness - 0.2, timesPaid * 0.05));
+        // brighter, but the floor creeps up a tiny bit per payment,
+        // so it never quite gets back to where it started
+        setDarkness(Math.max(darkness - 0.3, timesPaid * 0.02));
+        // and the fade slows down: 40% gentler per payment, but never zero
+        fadeAmount = Math.max(fadeAmount * 0.6, 0.01);
         showToast('paid ' + money(parseFloat(lightProduct.dataset.price)) +
                   ' to keep the lights on. brightness: ' + brightnessPercent());
       }
